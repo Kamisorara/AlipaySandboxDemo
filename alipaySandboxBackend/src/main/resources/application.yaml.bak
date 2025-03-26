@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+alipay:
+  appId:
+  appPrivateKey:
+  alipayPublicKey:
+  notifyUrl: https://***/alipay/callback/async
