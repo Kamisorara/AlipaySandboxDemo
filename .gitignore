@@ -1,3 +1,7 @@
+# ----------------------
+# Common/General ignores
+# ----------------------
+# Logs
 logs
 *.log
 npm-debug.log*
@@ -6,13 +10,32 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-build
-*.local
+# Environment files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env
 
-target/
+# IDE/Editor files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.iws
+*.iml
+*.ipr
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ----------------------
+# Java/Spring Boot (alipaySandboxBackend)
+# ----------------------
+alipaySandboxBackend/target/
+**/target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -28,6 +51,7 @@ mvnw
 mvnw.cmd
 HELP.md
 
+# Java IDE specific
 .apt_generated
 .classpath
 .factorypath
@@ -36,20 +60,21 @@ HELP.md
 .springBeans
 .sts4-cache
 
-.vscode/*
-!.vscode/extensions.json
-.idea
-*.iws
-*.iml
-*.ipr
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# ----------------------
+# React (alipay-react-demo)
+# ----------------------
+alipay-react-demo/node_modules
+alipay-react-demo/dist
+alipay-react-demo/dist-ssr
+alipay-react-demo/build
+alipay-react-demo/coverage
+alipay-react-demo/*.local
 
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# ----------------------
+# Electron (alipaySandboxElectron)
+# ----------------------
+alipaySandboxElectron/node_modules
+alipaySandboxElectron/dist
+alipaySandboxElectron/build
+alipaySandboxElectron/out
+alipaySandboxElectron/.electron-builder.cache
