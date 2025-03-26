@@ -79,10 +79,10 @@ public class AliPayService {
                 // 验签成功后，按照支付结果异步通知中的描述，对支付结果中的业务内容进行二次校验
                 String tradeStatus = params.get("trade_status");
                 String outTradeNo = params.get("out_trade_no");
-
+                System.out.println(params);
                 if ("TRADE_SUCCESS".equals(tradeStatus) || "TRADE_FINISHED".equals(tradeStatus)) {
                     // 支付成功，更新订单状态
-                    log.info("订单支付成功: {}", outTradeNo);
+                    log.info("订单支付成功: {}， 支付宝订单号为：{}", outTradeNo, params.get("trade_no"));
                     // 这里应该添加更新订单状态的逻辑
                 }
 
