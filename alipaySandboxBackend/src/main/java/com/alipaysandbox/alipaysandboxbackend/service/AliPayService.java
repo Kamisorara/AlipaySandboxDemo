@@ -30,18 +30,12 @@ public class AliPayService {
 
     public GenericResponse<Object> placeOrderForPCWeb(AliPayRequest aliPayRequest) throws IOException {
         // 构建支付宝客户端
-        AlipayClient alipayClient = new DefaultAlipayClient(
-                GATEWAY_URL,
-                aliPayConfig.getAppId(),
-                aliPayConfig.getAppPrivateKey(),
-                "json",
-                "UTF-8",
-                aliPayConfig.getAlipayPublicKey(),
-                "RSA2");
+        AlipayClient alipayClient = new DefaultAlipayClient(GATEWAY_URL, aliPayConfig.getAppId(), aliPayConfig.getAppPrivateKey(), "json", "UTF-8", aliPayConfig.getAlipayPublicKey(), "RSA2");
 
         // 创建API请求对象
         AlipayTradePagePayRequest request = new AlipayTradePagePayRequest();
-        request.setReturnUrl("http://localhost:5173/payment/return"); // 前端同步回调地址
+//        request.setReturnUrl("http://localhost:5173/payment/return"); // 前端同步回调地址
+        request.setReturnUrl("http://localhost:8080/alipay/callback/sync"); // 直接使用后端验证
         request.setNotifyUrl(aliPayConfig.getNotifyUrl()); // 后端异步回调地址
 
         // 构造请求参数
@@ -79,12 +73,7 @@ public class AliPayService {
 
         try {
             // 验证签名
-            boolean signVerified = AlipaySignature.rsaCheckV1(
-                    params,
-                    aliPayConfig.getAlipayPublicKey(),
-                    "UTF-8",
-                    "RSA2"
-            );
+            boolean signVerified = AlipaySignature.rsaCheckV1(params, aliPayConfig.getAlipayPublicKey(), "UTF-8", "RSA2");
 
             if (signVerified) {
                 // 验签成功后，按照支付结果异步通知中的描述，对支付结果中的业务内容进行二次校验
@@ -122,12 +111,7 @@ public class AliPayService {
 
         try {
             // 验证签名
-            boolean signVerified = AlipaySignature.rsaCheckV1(
-                    params,
-                    aliPayConfig.getAlipayPublicKey(),
-                    "UTF-8",
-                    "RSA2"
-            );
+            boolean signVerified = AlipaySignature.rsaCheckV1(params, aliPayConfig.getAlipayPublicKey(), "UTF-8", "RSA2");
 
             if (signVerified) {
                 // 同步回调主要是用于页面跳转，通常不做业务处理

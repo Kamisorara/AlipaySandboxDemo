@@ -79,3 +79,17 @@ alipaySandboxElectron/dist
 alipaySandboxElectron/build
 alipaySandboxElectron/out
 alipaySandboxElectron/.electron-builder.cache
+
+# ----------------------
+# Vue (alipaySandboxVue)
+# ----------------------
+alipaySandboxVue/node_modules
+alipaySandboxVue/.vscode
+alipaySandboxVue/dist
+alipaySandboxVue/.cache
+alipaySandboxVue/coverage
+alipaySandboxVue/.env.*
+alipaySandboxVue/*.local
+alipaySandboxVue/.npm
+alipaySandboxVue/.eslintcache
+alipaySandboxVue/.yarn-integrity
