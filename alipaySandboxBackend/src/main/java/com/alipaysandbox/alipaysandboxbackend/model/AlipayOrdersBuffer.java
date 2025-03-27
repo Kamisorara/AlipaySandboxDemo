@@ -21,7 +21,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("alipay_orders_buffer")
-public class AlipayOrdersBuffer extends Model<AlipayOrders> {
+public class AlipayOrdersBuffer extends AlipayOrders {
     //主键ID
     private Long id;
     //商户订单号，唯一标识商户的订单。

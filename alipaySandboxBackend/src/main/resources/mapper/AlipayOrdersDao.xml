@@ -3,12 +3,12 @@
 <mapper namespace="com.alipaysandbox.alipaysandboxbackend.mapper.AlipayOrdersDao">
 
     <resultMap type="com.alipaysandbox.alipaysandboxbackend.model.AlipayOrders" id="AlipayOrdersMap">
-        <result property="id" column="id" jdbcType="INTEGER"/>
+        <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="outTradeNo" column="out_trade_no" jdbcType="VARCHAR"/>
         <result property="tradeNo" column="trade_no" jdbcType="VARCHAR"/>
-        <result property="buyerId" column="buyer_id" jdbcType="INTEGER"/>
-        <result property="sellerId" column="seller_id" jdbcType="INTEGER"/>
-        <result property="invoiceAmount" column="invoice_amount" jdbcType="INTEGER"/>
+        <result property="buyerId" column="buyer_id" jdbcType="BIGINT"/>
+        <result property="sellerId" column="seller_id" jdbcType="BIGINT"/>
+        <result property="invoiceAmount" column="invoice_amount" jdbcType="BIGINT"/>
         <result property="tradeStatus" column="trade_status" jdbcType="VARCHAR"/>
         <result property="notifyId" column="notify_id" jdbcType="VARCHAR"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>

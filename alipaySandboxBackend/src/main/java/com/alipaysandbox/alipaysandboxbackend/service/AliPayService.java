@@ -6,8 +6,10 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipaysandbox.alipaysandboxbackend.config.AliPayConfig;
+import com.alipaysandbox.alipaysandboxbackend.mapper.AlipayOrdersDao;
 import com.alipaysandbox.alipaysandboxbackend.model.AliPayRequest;
 import com.alipaysandbox.alipaysandboxbackend.model.GenericResponse;
+import com.alipaysandbox.alipaysandboxbackend.service.impl.AlipayOrderService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +26,9 @@ public class AliPayService {
 
     @Resource
     private AliPayConfig aliPayConfig;
+
+    @Resource
+    private AlipayOrderService alipayOrderService;
 
     // 支付宝网关（沙箱环境）
     private static final String GATEWAY_URL = "https://openapi-sandbox.dl.alipaydev.com/gateway.do";
@@ -58,6 +63,9 @@ public class AliPayService {
         }
     }
 
+    /**
+     * 依赖于后端的回调，用于处理支付业务信息，支付宝通过公网回调该接口
+     */
     public String orderCallbackInAsync(HttpServletRequest request) {
         // 获取支付宝回调参数
         Map<String, String> params = new HashMap<>();
@@ -74,18 +82,25 @@ public class AliPayService {
         try {
             // 验证签名
             boolean signVerified = AlipaySignature.rsaCheckV1(params, aliPayConfig.getAlipayPublicKey(), "UTF-8", "RSA2");
-
+            log.info("signVerified: {}", signVerified);
             if (signVerified) {
                 // 验签成功后，按照支付结果异步通知中的描述，对支付结果中的业务内容进行二次校验
                 String tradeStatus = params.get("trade_status");
                 String outTradeNo = params.get("out_trade_no");
-                System.out.println(params);
+                log.info(params.toString());
+//                System.out.println(params);
                 if ("TRADE_SUCCESS".equals(tradeStatus) || "TRADE_FINISHED".equals(tradeStatus)) {
                     // 支付成功，更新订单状态
                     log.info("订单支付成功: {}， 支付宝订单号为：{}", outTradeNo, params.get("trade_no"));
                     // 这里应该添加更新订单状态的逻辑
+                    alipayOrderService.insertOrder(params);
+                    boolean success = alipayOrderService.updateOrderStatus(params);
+                    if (success) {
+                        log.info("订单缓存表状态更新成功");
+                    } else {
+                        log.error("订单缓存表状态更新失败");
+                    }
                 }
-
                 return "success"; // 返回给支付宝的响应
             } else {
                 log.error("支付宝回调签名验证失败");
@@ -97,6 +112,9 @@ public class AliPayService {
         }
     }
 
+    /**
+     * 依赖于用户浏览器的回调，用于改善用户体验
+     */
     public void orderCallbackInSync(HttpServletRequest request, HttpServletResponse response) {
         Map<String, String> params = new HashMap<>();
         Map<String, String[]> requestParams = request.getParameterMap();

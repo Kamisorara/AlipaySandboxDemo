@@ -3,6 +3,7 @@ package com.alipaysandbox.alipaysandboxbackend.controller;
 import com.alipaysandbox.alipaysandboxbackend.model.AliPayRequest;
 import com.alipaysandbox.alipaysandboxbackend.model.GenericResponse;
 import com.alipaysandbox.alipaysandboxbackend.service.AliPayService;
+import com.alipaysandbox.alipaysandboxbackend.service.impl.AlipayOrderService;
 import com.alipaysandbox.alipaysandboxbackend.service.impl.SubmitOrderService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +21,8 @@ public class AliPayController {
     private AliPayService aliPayService;
     @Resource
     private SubmitOrderService submitOrderService;
+    @Resource
+    private AlipayOrderService alipayOrderService;
 
 
     /**
@@ -47,6 +50,9 @@ public class AliPayController {
         return aliPayService.orderCallbackInAsync(request);
     }
 
+    /**
+     * 异步回调 用于展示支付结果或重定向到成功页面
+     */
     @GetMapping("/callback/sync")
     public void syncCallback(HttpServletRequest request, HttpServletResponse response) {
         aliPayService.orderCallbackInSync(request, response);

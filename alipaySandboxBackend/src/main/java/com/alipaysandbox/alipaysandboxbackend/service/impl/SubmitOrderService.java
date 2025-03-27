@@ -1,6 +1,6 @@
 package com.alipaysandbox.alipaysandboxbackend.service.impl;
 
-import com.alipaysandbox.alipaysandboxbackend.mapper.AlipayOrderBufferDao;
+import com.alipaysandbox.alipaysandboxbackend.mapper.AlipayOrdersBufferDao;
 import com.alipaysandbox.alipaysandboxbackend.model.AlipayOrdersBuffer;
 import com.alipaysandbox.alipaysandboxbackend.model.GenericResponse;
 import com.alipaysandbox.alipaysandboxbackend.service.ISubmitOrderService;
@@ -15,7 +15,7 @@ import static java.lang.Math.*;
 public class SubmitOrderService implements ISubmitOrderService {
 
     @Resource
-    private AlipayOrderBufferDao alipayOrderBufferDao;
+    private AlipayOrdersBufferDao alipayOrdersBufferDao;
 
     @Override
     public GenericResponse submitOrder() {
@@ -34,7 +34,7 @@ public class SubmitOrderService implements ISubmitOrderService {
         orderBuffer.setBody("这是商品描述");
         orderBuffer.setTradeStatus("WAIT_BUYER_PAY");
 
-        boolean success = alipayOrderBufferDao.insert(orderBuffer) > 0;
+        boolean success = alipayOrdersBufferDao.insert(orderBuffer) > 0;
 
         if (success) {
             return GenericResponse.success(orderBuffer);

@@ -1,8 +1,56 @@
 package com.alipaysandbox.alipaysandboxbackend.service.impl;
 
+import com.alipaysandbox.alipaysandboxbackend.mapper.AlipayOrdersBufferDao;
+import com.alipaysandbox.alipaysandboxbackend.mapper.AlipayOrdersDao;
+import com.alipaysandbox.alipaysandboxbackend.model.AlipayOrders;
 import com.alipaysandbox.alipaysandboxbackend.service.IAlipayOrderService;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class AlipayOrderService implements IAlipayOrderService {
+    @Resource
+    private AlipayOrdersDao alipayOrdersDao;
+
+    @Resource
+    private AlipayOrdersBufferDao alipayOrdersBufferDao;
+
+    private AlipayOrders getAlipayOrders(Map<String, String> params) {
+        AlipayOrders alipayOrders = new AlipayOrders();
+        alipayOrders.setSubject(params.get("subject"));
+        alipayOrders.setBody(params.get("body"));
+        alipayOrders.setOutTradeNo(params.get("out_trade_no"));
+        // 金额单位为分
+        alipayOrders.setInvoiceAmount((long) (Double.parseDouble(params.get("invoice_amount")) * 100));
+        alipayOrders.setNotifyId(params.get("notify_id"));
+        alipayOrders.setTradeStatus(params.get("trade_status"));
+        alipayOrders.setTradeNo(params.get("trade_no"));
+        alipayOrders.setBuyerId(Long.valueOf(params.get("buyer_id")));
+        alipayOrders.setSellerId(Long.valueOf(params.get("seller_id")));
+        return alipayOrders;
+    }
+
+    @Override
+    public void insertOrder(Map<String, String> params) {
+        AlipayOrders alipayOrders = getAlipayOrders(params);
+
+        try {
+            alipayOrdersDao.insert(alipayOrders);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean updateOrderStatus(Map<String, String> params) {
+        try {
+            AlipayOrders alipayOrders = getAlipayOrders(params);
+            return alipayOrdersBufferDao.updateOrderBuffer(alipayOrders) > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

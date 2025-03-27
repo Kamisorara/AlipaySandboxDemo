@@ -9,5 +9,6 @@ import org.apache.ibatis.annotations.Mapper;
  * 订单缓冲表Mapper
  */
 @Mapper
-public interface AlipayOrderBufferDao extends BaseMapper<AlipayOrdersBuffer> {
+public interface AlipayOrdersBufferDao extends BaseMapper<AlipayOrdersBuffer> {
+    int updateOrderBuffer(AlipayOrders order);
 }
