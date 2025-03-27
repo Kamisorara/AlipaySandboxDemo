@@ -86,17 +86,15 @@ const handlePayment = async () => {
       div.innerHTML = response.data.data;
       document.body.appendChild(div);
 
-      // 在打开的新的窗口中进行支付
+      // 在当前页面中进行支付
       const form = document.forms[0];
       if (form) {
-        form.target = '_blank';
+        // 移除 target="_blank"，使表单在当前页面提交
+        form.removeAttribute('target'); // 或使用 form.target = '_self';
         form.submit();
       }
 
-      // 提交后移除临时div
-      setTimeout(() => {
-        document.body.removeChild(div);
-      }, 100);
+      // 提交后不需要立即移除div，因为页面会跳转
     } else {
       error.value = response.data.message || '创建订单失败';
     }

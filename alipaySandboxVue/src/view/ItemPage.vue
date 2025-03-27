@@ -5,7 +5,8 @@
     <div v-else-if="error" class="error">{{ error }}</div>
     <div v-else>
       <div class="order-list">
-        <div v-for="order in orderList" :key="order.outTradeNo" class="order-item">
+        <div v-for="order in orderList" :key="order.outTradeNo" class="order-item"
+          :class="{ 'success-order': order.tradeStatus === 'TRADE_SUCCESS' }">
           <p><strong>订单号:</strong> {{ order.outTradeNo }}</p>
           <p><strong>订单金额:</strong> {{ formatAmount(order.invoiceAmount) }}元</p>
           <p><strong>商品名称:</strong> {{ order.subject }}</p>
@@ -17,9 +18,11 @@
             </span>
           </p>
           <p v-if="order.tradeStatus === 'TRADE_CLOSED'"><strong>状态:</strong> <span style="color: red;">已关闭</span></p>
+          <p v-if="order.tradeStatus === 'TRADE_SUCCESS'"><strong>状态:</strong> <span style="color: green;">已支付</span>
+          </p>
           <div>
             <button @click="goToPayment(order)" :disabled="!isOrderPayable(order)" class="payment-btn"
-              :class="{ 'disabled-btn': !isOrderPayable(order) }">
+              :class="{ 'disabled-btn': !isOrderPayable(order), 'success-btn': order.tradeStatus === 'TRADE_SUCCESS' }">
               {{ getButtonText(order) }}
             </button>
           </div>
@@ -122,13 +125,18 @@ const getOrderBufferList = async () => {
 
 // 判断订单是否可支付
 const isOrderPayable = (order: OrderType): boolean => {
-  return parseInt(order.remainingTime) > 0 && order.tradeStatus !== 'TRADE_CLOSED';
+  return parseInt(order.remainingTime) > 0 &&
+    order.tradeStatus !== 'TRADE_CLOSED' &&
+    order.tradeStatus !== 'TRADE_SUCCESS';
 };
 
 // 获取按钮文本
 const getButtonText = (order: OrderType): string => {
   if (order.tradeStatus === 'TRADE_CLOSED') {
     return '订单已关闭';
+  }
+  if (order.tradeStatus === 'TRADE_SUCCESS') {
+    return '已支付';
   }
   if (parseInt(order.remainingTime) <= 0) {
     return '已过期';
@@ -237,5 +245,13 @@ onMounted(() => {
 /* 可以添加一个关闭状态的样式 */
 .trade-closed {
   background-color: #ff4d4f;
+}
+
+.success-order {
+  border: 1px solid #52c41a;
+}
+
+.success-btn {
+  cursor: default !important;
 }
 </style>
