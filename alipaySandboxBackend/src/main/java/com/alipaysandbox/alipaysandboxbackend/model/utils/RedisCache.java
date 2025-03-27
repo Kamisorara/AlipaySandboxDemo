@@ -219,4 +219,32 @@ public class RedisCache {
     public Collection<String> keys(final String pattern) {
         return redisTemplate.keys(pattern);
     }
+
+    /**
+     * 将数据放入zSet缓存，设置score
+     */
+    public Boolean zAdd(final String key, final Object value, final double score) {
+        return redisTemplate.opsForZSet().add(key, value, score);
+    }
+
+    /**
+     * 获取zSet中指定分数范围的元素
+     */
+    public Set<Object> zRangeByScore(final String key, final double min, final double max) {
+        return redisTemplate.opsForZSet().rangeByScore(key, min, max);
+    }
+
+    /**
+     * 删除zSet中的元素，传入一个或多个 Object 类型的参数。在方法内部，当作一个数组来处理。
+     */
+    public Long zRemove(final String key, final Object... values) {
+        return redisTemplate.opsForZSet().remove(key, values);
+    }
+
+    /**
+     * 获取元素在zSet中的score值
+     */
+    public Double zScore(final String key, final Object value) {
+        return redisTemplate.opsForZSet().score(key, value);
+    }
 }
