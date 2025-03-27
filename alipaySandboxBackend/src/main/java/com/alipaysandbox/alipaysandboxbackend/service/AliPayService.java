@@ -6,10 +6,8 @@ import com.alipay.api.DefaultAlipayClient;
 import com.alipay.api.internal.util.AlipaySignature;
 import com.alipay.api.request.AlipayTradePagePayRequest;
 import com.alipaysandbox.alipaysandboxbackend.config.AliPayConfig;
-import com.alipaysandbox.alipaysandboxbackend.mapper.AlipayOrdersDao;
 import com.alipaysandbox.alipaysandboxbackend.model.AliPayRequest;
 import com.alipaysandbox.alipaysandboxbackend.model.GenericResponse;
-import com.alipaysandbox.alipaysandboxbackend.service.impl.AlipayOrderService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,7 +26,7 @@ public class AliPayService {
     private AliPayConfig aliPayConfig;
 
     @Resource
-    private AlipayOrderService alipayOrderService;
+    private IAlipayOrderService alipayOrderService;
 
     // 支付宝网关（沙箱环境）
     private static final String GATEWAY_URL = "https://openapi-sandbox.dl.alipaydev.com/gateway.do";

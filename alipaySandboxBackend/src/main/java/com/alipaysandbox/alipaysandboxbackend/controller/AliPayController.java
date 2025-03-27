@@ -3,6 +3,8 @@ package com.alipaysandbox.alipaysandboxbackend.controller;
 import com.alipaysandbox.alipaysandboxbackend.model.AliPayRequest;
 import com.alipaysandbox.alipaysandboxbackend.model.GenericResponse;
 import com.alipaysandbox.alipaysandboxbackend.service.AliPayService;
+import com.alipaysandbox.alipaysandboxbackend.service.IAlipayOrderService;
+import com.alipaysandbox.alipaysandboxbackend.service.ISubmitOrderService;
 import com.alipaysandbox.alipaysandboxbackend.service.impl.AlipayOrderService;
 import com.alipaysandbox.alipaysandboxbackend.service.impl.SubmitOrderService;
 import jakarta.annotation.Resource;
@@ -20,9 +22,8 @@ public class AliPayController {
     @Resource
     private AliPayService aliPayService;
     @Resource
-    private SubmitOrderService submitOrderService;
-    @Resource
-    private AlipayOrderService alipayOrderService;
+    private ISubmitOrderService submitOrderService;
+
 
 
     /**

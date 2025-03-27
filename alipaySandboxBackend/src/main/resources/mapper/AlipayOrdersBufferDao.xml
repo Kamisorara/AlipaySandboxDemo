@@ -20,9 +20,6 @@
     <update id="updateOrderBuffer" parameterType="com.alipaysandbox.alipaysandboxbackend.model.AlipayOrdersBuffer">
         update alipay_orders_buffer
         <set>
-            <if test="outTradeNo != null">
-                out_trade_no = #{outTradeNo},
-            </if>
             <if test="tradeNo != null">
                 trade_no = #{tradeNo},
             </if>
@@ -41,17 +38,8 @@
             <if test="notifyId != null">
                 notify_id = #{notifyId},
             </if>
-            <if test="createTime != null">
-                create_time = #{createTime},
-            </if>
             <if test="updateTime != null">
                 update_time = #{updateTime},
-            </if>
-            <if test="subject != null">
-                subject = #{subject},
-            </if>
-            <if test="body != null">
-                body = #{body},
             </if>
         </set>
         where out_trade_no = #{outTradeNo}
