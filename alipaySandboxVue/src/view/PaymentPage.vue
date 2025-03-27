@@ -1,8 +1,13 @@
 <template>
   <div>
     <h2>支付宝沙盒支付测试</h2>
+    <div class="order-info" v-if="orderDetails">
+      <p><strong>订单号:</strong> {{ orderDetails.outTradeNo }}</p>
+      <p><strong>金额:</strong> {{ formatAmount(orderDetails.invoiceAmount) }}元</p>
+      <p><strong>商品:</strong> {{ orderDetails.subject }}</p>
+    </div>
     <button @click="handlePayment" :disabled="loading">
-      {{ loading ? '处理中...' : '支付169元' }}
+      {{ loading ? '处理中...' : `支付${orderDetails ? formatAmount(orderDetails.invoiceAmount) : ''}元` }}
     </button>
 
     <div v-if="error" style="color: red; margin-top: 10px">
@@ -12,8 +17,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
+
+const route = useRoute();
 
 interface PaymentRequestType {
   outTradeNo: string;
@@ -22,8 +30,34 @@ interface PaymentRequestType {
   body: string;
 }
 
+interface OrderDetails {
+  outTradeNo: string;
+  invoiceAmount: string;
+  subject: string;
+  body: string;
+}
+
 const loading = ref(false);
 const error = ref<string | null>(null);
+const orderDetails = ref<OrderDetails | null>(null);
+
+// 将金额从分转换为元
+const formatAmount = (amount: string): string => {
+  const amountNum = parseInt(amount);
+  return (amountNum / 100).toFixed(2);
+};
+
+onMounted(() => {
+  // 从路由参数获取订单信息
+  if (route.query.outTradeNo) {
+    orderDetails.value = {
+      outTradeNo: route.query.outTradeNo as string,
+      invoiceAmount: route.query.invoiceAmount as string,
+      subject: route.query.subject as string,
+      body: route.query.body as string
+    };
+  }
+});
 
 const handlePayment = async () => {
   // 处理交易
@@ -31,11 +65,15 @@ const handlePayment = async () => {
   error.value = null;
 
   try {
+    if (!orderDetails.value) {
+      throw new Error('订单信息不完整');
+    }
+
     const paymentRequest: PaymentRequestType = {
-      outTradeNo: `order_${Date.now()}`, // 生成唯一订单号
-      totalAmount: 169, // 金额
-      subject: '测试商品',
-      body: '这是一个测试商品描述'
+      outTradeNo: orderDetails.value.outTradeNo,
+      totalAmount: parseInt(orderDetails.value.invoiceAmount) / 100, // 转换为元
+      subject: orderDetails.value.subject,
+      body: orderDetails.value.body
     };
 
     // 发起支付请求
@@ -69,4 +107,13 @@ const handlePayment = async () => {
   }
 };
 </script>
-<style scoped></style>
+
+<style scoped>
+.order-info {
+  margin: 20px 0;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  /* background-color: #f9f9f9; */
+}
+</style>
