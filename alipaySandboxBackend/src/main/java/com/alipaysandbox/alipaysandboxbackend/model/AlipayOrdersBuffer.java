@@ -11,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.util.Date;
 
 /**
- * (AlipayOrders)表实体类
+ * (AlipayOrdersBuffer)缓冲表
  *
  * @author AtlasKK
  * @since 2025-03-26 22:14:06
@@ -20,8 +20,8 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("alipay_orders")
-public class AlipayOrders extends Model<AlipayOrders> {
+@Table("alipay_orders_buffer")
+public class AlipayOrdersBuffer extends Model<AlipayOrders> {
     //主键ID
     private Long id;
     //商户订单号，唯一标识商户的订单。

@@ -3,6 +3,7 @@ package com.alipaysandbox.alipaysandboxbackend.controller;
 import com.alipaysandbox.alipaysandboxbackend.model.AliPayRequest;
 import com.alipaysandbox.alipaysandboxbackend.model.GenericResponse;
 import com.alipaysandbox.alipaysandboxbackend.service.AliPayService;
+import com.alipaysandbox.alipaysandboxbackend.service.impl.SubmitOrderService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,11 +13,22 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/alipay")
-@CrossOrigin(origins = "http://localhost:5173") // 允许前端跨域访问
+// 允许前端跨域访问
 public class AliPayController {
 
     @Resource
     private AliPayService aliPayService;
+    @Resource
+    private SubmitOrderService submitOrderService;
+
+
+    /**
+     * 提交订单
+     */
+    @GetMapping("/submit-order")
+    public GenericResponse submitOrder() {
+        return submitOrderService.submitOrder();
+    }
 
     @PostMapping("/order")
     public GenericResponse<Object> placeOrderForPCWeb(@RequestBody AliPayRequest aliPayRequest) {
