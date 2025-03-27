@@ -33,7 +33,7 @@ public class OrderTimeoutService {
     public void addOrderTimeout(String outTradeNo, Long timeoutSeconds) {
         // 当前时间加上超时时间算出超时时间
         double expireTime = Instant.now().getEpochSecond() + timeoutSeconds;
-        redisCache.zAdd(ORDER_TIMEOUT_KEY, timeoutSeconds, expireTime);
+        redisCache.zAdd(ORDER_TIMEOUT_KEY, outTradeNo, expireTime);
         log.info("订单: {} 已添加超时任务，将在 {} 秒后超时", outTradeNo, timeoutSeconds);
     }
 
