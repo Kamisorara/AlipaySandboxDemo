@@ -10,8 +10,18 @@
           <p><strong>订单金额:</strong> {{ formatAmount(order.invoiceAmount) }}元</p>
           <p><strong>商品名称:</strong> {{ order.subject }}</p>
           <p><strong>商品描述:</strong> {{ order.body }}</p>
+          <p><strong>剩余支付时间:</strong>
+            <span style="color: red;"
+              :class="{ 'expire-soon': parseInt(order.remainingTime) < 10 && parseInt(order.remainingTime) > 0 }">
+              {{ isOrderPayable(order) ? `${order.remainingTime}秒` : '已过期' }}
+            </span>
+          </p>
+          <p v-if="order.tradeStatus === 'TRADE_CLOSED'"><strong>状态:</strong> <span style="color: red;">已关闭</span></p>
           <div>
-            <button @click="goToPayment(order)">前往支付</button>
+            <button @click="goToPayment(order)" :disabled="!isOrderPayable(order)" class="payment-btn"
+              :class="{ 'disabled-btn': !isOrderPayable(order) }">
+              {{ getButtonText(order) }}
+            </button>
           </div>
         </div>
       </div>
@@ -22,11 +32,9 @@
 
 <script setup lang='ts'>
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
-
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-// const route = useRoute();
 const router = useRouter();
 
 interface OrderType {
@@ -34,11 +42,12 @@ interface OrderType {
   invoiceAmount: string;
   subject: string;
   body: string;
+  remainingTime: string; // 添加倒计时属性
+  tradeStatus?: string;  // 添加交易状态属性
 }
 
 // 订单列表
 const orderList = ref<OrderType[]>([]);
-
 const loading = ref(false);
 const error = ref<string | null>(null);
 
@@ -46,6 +55,24 @@ const error = ref<string | null>(null);
 const formatAmount = (amount: string): string => {
   const amountNum = parseInt(amount);
   return (amountNum / 100).toFixed(2);
+};
+
+// 开始倒计时逻辑
+const startCountdowns = () => {
+  const interval = setInterval(() => {
+    orderList.value = orderList.value.map(order => {
+      const time = parseInt(order.remainingTime);
+      if (time > 0) {
+        return { ...order, remainingTime: String(time - 1) };
+      }
+      return order;
+    });
+  }, 1000); // 每秒更新一次
+
+  // 组件卸载时清除定时器
+  onUnmounted(() => {
+    clearInterval(interval);
+  });
 };
 
 // 提交（获取）随机订单
@@ -71,22 +98,69 @@ const submitOrder = async () => {
   }
 };
 
+// 获取订单缓冲列表
+const getOrderBufferList = async () => {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const response = await axios.get('http://localhost:8080/alipay/order-buffer-list');
+    console.log("后端返回的参数为:", response.data);
+
+    if (response.data.code === 200) {
+      orderList.value = response.data.data;
+    } else {
+      error.value = response.data.message || '获取订单列表失败';
+    }
+  } catch (err: any) {
+    console.error('获取订单列表时出错:', err);
+    error.value = err.message || '请求出错';
+  } finally {
+    loading.value = false;
+  }
+}
+
+// 判断订单是否可支付
+const isOrderPayable = (order: OrderType): boolean => {
+  return parseInt(order.remainingTime) > 0 && order.tradeStatus !== 'TRADE_CLOSED';
+};
+
+// 获取按钮文本
+const getButtonText = (order: OrderType): string => {
+  if (order.tradeStatus === 'TRADE_CLOSED') {
+    return '订单已关闭';
+  }
+  if (parseInt(order.remainingTime) <= 0) {
+    return '已过期';
+  }
+  return '前往支付';
+};
+
 // 前往支付
 const goToPayment = (order: OrderType) => {
+  // 检查是否可以支付
+  if (!isOrderPayable(order)) {
+    return;
+  }
+
   router.push({
     path: '/payment',
     query: {
       outTradeNo: order.outTradeNo,
       invoiceAmount: order.invoiceAmount,
       subject: order.subject,
-      body: order.body
+      body: order.body,
+      remainingTime: order.remainingTime,
+      tradeStatus: order.tradeStatus
     }
   });
 };
 
 onMounted(() => {
-  // 页面加载时调用函数，需要加上()
-  submitOrder();
+  // 页面加载时获取订单列表
+  getOrderBufferList();
+  // 启动倒计时
+  startCountdowns();
 });
 </script>
 
@@ -106,7 +180,20 @@ onMounted(() => {
   padding: 15px;
   margin-bottom: 15px;
   border-radius: 4px;
-  /* background-color: #f9f9f9; */
+}
+
+.payment-btn {
+  background-color: #1890ff;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.disabled-btn {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
 .submit-button {
@@ -125,5 +212,30 @@ onMounted(() => {
 .error {
   color: red;
   margin-bottom: 15px;
+}
+
+.expire-soon {
+  color: #ff4d4f;
+  font-weight: bold;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 可以添加一个关闭状态的样式 */
+.trade-closed {
+  background-color: #ff4d4f;
 }
 </style>
