@@ -28,6 +28,10 @@ public class AliPayService {
     @Resource
     private IAlipayOrderService alipayOrderService;
 
+    @Resource
+    private OrderTimeoutService orderTimeoutService;
+
+
     // 支付宝网关（沙箱环境）
     private static final String GATEWAY_URL = "https://openapi-sandbox.dl.alipaydev.com/gateway.do";
 
@@ -90,6 +94,8 @@ public class AliPayService {
                 if ("TRADE_SUCCESS".equals(tradeStatus) || "TRADE_FINISHED".equals(tradeStatus)) {
                     // 支付成功，更新订单状态
                     log.info("订单支付成功: {}， 支付宝订单号为：{}", outTradeNo, params.get("trade_no"));
+                    // 支付成功，取消超时任务
+                    orderTimeoutService.removeOrderTimeout(outTradeNo);
                     // 这里应该添加更新订单状态的逻辑
                     alipayOrderService.insertOrder(params);
                     boolean success = alipayOrderService.updateOrderStatus(params);

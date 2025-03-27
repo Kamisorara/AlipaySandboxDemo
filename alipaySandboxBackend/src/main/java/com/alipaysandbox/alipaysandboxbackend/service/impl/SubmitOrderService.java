@@ -4,6 +4,7 @@ import com.alipaysandbox.alipaysandboxbackend.mapper.AlipayOrdersBufferDao;
 import com.alipaysandbox.alipaysandboxbackend.model.AlipayOrdersBuffer;
 import com.alipaysandbox.alipaysandboxbackend.model.GenericResponse;
 import com.alipaysandbox.alipaysandboxbackend.service.ISubmitOrderService;
+import com.alipaysandbox.alipaysandboxbackend.service.OrderTimeoutService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +17,12 @@ public class SubmitOrderService implements ISubmitOrderService {
 
     @Resource
     private AlipayOrdersBufferDao alipayOrdersBufferDao;
+
+    @Resource
+    private OrderTimeoutService orderTimeoutService;
+
+    // 测试起见订单超时时间设置为 60秒
+    private static final long DEFAULT_ORDER_TIMEOUT = 60L;
 
     @Override
     public GenericResponse submitOrder() {
@@ -37,6 +44,8 @@ public class SubmitOrderService implements ISubmitOrderService {
         boolean success = alipayOrdersBufferDao.insert(orderBuffer) > 0;
 
         if (success) {
+            // 设置订单超时取消
+            orderTimeoutService.addOrderTimeout(outTradeNo, DEFAULT_ORDER_TIMEOUT);
             return GenericResponse.success(orderBuffer);
         } else {
             return GenericResponse.error("订单创建失败");
