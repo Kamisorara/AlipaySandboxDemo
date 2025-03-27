@@ -1,6 +1,7 @@
 package com.alipaysandbox.alipaysandboxbackend.model;
 
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,6 +47,10 @@ public class AlipayOrdersBuffer extends AlipayOrders {
     private Date createTime;
     //更新时间
     private Date updateTime;
+
+    // 订单剩余时间
+    @TableField(exist = false)
+    private Long remainingTime;
 
 }
 

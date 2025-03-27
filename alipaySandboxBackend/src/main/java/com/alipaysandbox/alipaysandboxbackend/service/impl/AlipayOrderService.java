@@ -3,10 +3,15 @@ package com.alipaysandbox.alipaysandboxbackend.service.impl;
 import com.alipaysandbox.alipaysandboxbackend.mapper.AlipayOrdersBufferDao;
 import com.alipaysandbox.alipaysandboxbackend.mapper.AlipayOrdersDao;
 import com.alipaysandbox.alipaysandboxbackend.model.AlipayOrders;
+import com.alipaysandbox.alipaysandboxbackend.model.AlipayOrdersBuffer;
+import com.alipaysandbox.alipaysandboxbackend.model.GenericResponse;
 import com.alipaysandbox.alipaysandboxbackend.service.IAlipayOrderService;
+import com.alipaysandbox.alipaysandboxbackend.service.OrderTimeoutService;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -16,6 +21,8 @@ public class AlipayOrderService implements IAlipayOrderService {
 
     @Resource
     private AlipayOrdersBufferDao alipayOrdersBufferDao;
+    @Autowired
+    private OrderTimeoutService orderTimeoutService;
 
     private AlipayOrders getAlipayOrders(Map<String, String> params) {
         AlipayOrders alipayOrders = new AlipayOrders();
@@ -52,5 +59,19 @@ public class AlipayOrderService implements IAlipayOrderService {
             e.printStackTrace();
             return false;
         }
+    }
+
+    @Override
+    public GenericResponse getOrderBufferList() {
+        List<AlipayOrdersBuffer> alipayOrdersBuffers = alipayOrdersBufferDao.selectOrderBufferList();
+        // 从redis zSet中查询订单超时时间
+        if (alipayOrdersBuffers != null && !alipayOrdersBuffers.isEmpty()) {
+            for (AlipayOrdersBuffer order : alipayOrdersBuffers) {
+                // 获取订单剩余时间
+                long orderRemainingTime = orderTimeoutService.getOrderRemainingTime(order.getOutTradeNo());
+                order.setRemainingTime(orderRemainingTime);
+            }
+        }
+        return GenericResponse.success(alipayOrdersBuffers);
     }
 }

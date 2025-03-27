@@ -3,10 +3,9 @@ package com.alipaysandbox.alipaysandboxbackend.controller;
 import com.alipaysandbox.alipaysandboxbackend.model.AliPayRequest;
 import com.alipaysandbox.alipaysandboxbackend.model.GenericResponse;
 import com.alipaysandbox.alipaysandboxbackend.service.AliPayService;
-import com.alipaysandbox.alipaysandboxbackend.service.IAlipayOrderService;
 import com.alipaysandbox.alipaysandboxbackend.service.ISubmitOrderService;
+import com.alipaysandbox.alipaysandboxbackend.service.OrderTimeoutService;
 import com.alipaysandbox.alipaysandboxbackend.service.impl.AlipayOrderService;
-import com.alipaysandbox.alipaysandboxbackend.service.impl.SubmitOrderService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,9 +20,15 @@ public class AliPayController {
 
     @Resource
     private AliPayService aliPayService;
+
     @Resource
     private ISubmitOrderService submitOrderService;
 
+    @Resource
+    private OrderTimeoutService orderTimeoutService;
+
+    @Resource
+    private AlipayOrderService alipayOrderService;
 
 
     /**
@@ -57,5 +62,25 @@ public class AliPayController {
     @GetMapping("/callback/sync")
     public void syncCallback(HttpServletRequest request, HttpServletResponse response) {
         aliPayService.orderCallbackInSync(request, response);
+    }
+
+    /**
+     * 获取订单剩余时间
+     */
+    @GetMapping("/order/remaining-time/{outTradeNo}")
+    public GenericResponse<Long> getOrderRemainingTime(@PathVariable String outTradeNo) {
+        long remainingTime = orderTimeoutService.getOrderRemainingTime(outTradeNo);
+        if (remainingTime < 0) {
+            return GenericResponse.error("订单不存在或已超时");
+        }
+        return GenericResponse.success(remainingTime);
+    }
+
+    /**
+     * 获取订单缓冲表里的信息
+     */
+    @GetMapping("/order-buffer-list")
+    public GenericResponse getOrderBufferList() {
+        return alipayOrderService.getOrderBufferList();
     }
 }

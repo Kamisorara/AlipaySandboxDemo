@@ -17,6 +17,11 @@
         <result property="body" column="body" jdbcType="VARCHAR"/>
     </resultMap>
 
+    <sql id="OrderBufferBase">
+        select *
+        from alipay_orders_buffer;
+    </sql>
+
     <update id="updateOrderBuffer" parameterType="com.alipaysandbox.alipaysandboxbackend.model.AlipayOrdersBuffer">
         update alipay_orders_buffer
         <set>
@@ -45,5 +50,8 @@
         where out_trade_no = #{outTradeNo}
     </update>
 
+    <select id="selectOrderBufferList" resultMap="AlipayOrdersBufferMap">
+        <include refid="OrderBufferBase"/>
+    </select>
 </mapper>
 

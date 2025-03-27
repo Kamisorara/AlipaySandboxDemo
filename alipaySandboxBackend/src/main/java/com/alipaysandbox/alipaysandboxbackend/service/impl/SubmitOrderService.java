@@ -40,6 +40,8 @@ public class SubmitOrderService implements ISubmitOrderService {
         orderBuffer.setSubject("测试商品" + uuid);
         orderBuffer.setBody("这是商品描述");
         orderBuffer.setTradeStatus("WAIT_BUYER_PAY");
+        // 初始设置订单超时时间
+        orderBuffer.setRemainingTime(DEFAULT_ORDER_TIMEOUT);
 
         boolean success = alipayOrdersBufferDao.insert(orderBuffer) > 0;
 
