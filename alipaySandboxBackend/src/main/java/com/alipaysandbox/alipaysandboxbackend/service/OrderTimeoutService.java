@@ -94,7 +94,7 @@ public class OrderTimeoutService {
 
         // 更新订单状态为已取消
         AlipayOrdersBuffer order = new AlipayOrdersBuffer();
-        order.setTradeNo(outTradeNo);
+        order.setOutTradeNo(outTradeNo);
         order.setTradeStatus("TRADE_CLOSED");
         order.setUpdateTime(new Date());
 
