@@ -21,7 +21,8 @@ public class AlipayOrderService implements IAlipayOrderService {
 
     @Resource
     private AlipayOrdersBufferDao alipayOrdersBufferDao;
-    @Autowired
+
+    @Resource
     private OrderTimeoutService orderTimeoutService;
 
     private AlipayOrders getAlipayOrders(Map<String, String> params) {
